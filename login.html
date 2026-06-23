@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Apex Credit System</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Custom Styles -->
+  <link href="assets/css/style.css" rel="stylesheet">
+  <!-- Local Database Script -->
+  <script src="assets/js/db.js"></script>
+</head>
+<body class="login-body">
+
+  <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh; padding: 1.5rem;">
+    <div class="card login-card">
+      <div class="row g-0" style="min-height: 550px;">
+        <!-- Left Side: Informational/Branding Pane -->
+        <div class="col-lg-6 login-info-section d-none d-lg-flex">
+          <div>
+            <div class="d-flex align-items-center mb-4">
+              <span class="bg-primary text-white rounded-3 p-2 d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                <i class="bi bi-shield-lock-fill fs-4 text-info"></i>
+              </span>
+              <h4 class="mb-0 fw-bold tracking-tight">Apex Credit</h4>
+            </div>
+            
+            <h1 class="fw-bold mb-3 display-6 lh-sm">Next-Generation Loan Origination & Credit Processing</h1>
+            <p class="text-secondary-emphasis opacity-75 fs-5">Secure, efficient, and role-based access control built for enterprise banking operations.</p>
+          </div>
+
+          <div>
+            <div class="d-flex align-items-center mb-3">
+              <i class="bi bi-check-circle-fill text-success me-3 fs-5"></i>
+              <span>Smart Credit Decisioning & Risk Assessment</span>
+            </div>
+            <div class="d-flex align-items-center mb-3">
+              <i class="bi bi-check-circle-fill text-success me-3 fs-5"></i>
+              <span>Automated KYC & Documentation Verification</span>
+            </div>
+            <div class="d-flex align-items-center mb-4">
+              <i class="bi bi-check-circle-fill text-success me-3 fs-5"></i>
+              <span>Audit-Ready Logging & Admin Panel Control</span>
+            </div>
+
+            <div class="pt-4 border-top border-secondary-subtle opacity-50">
+              <small>© 2026 Apex Financial Corp. All rights reserved.</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side: Login Form Pane -->
+        <div class="col-lg-6 bg-white p-4 p-md-5 d-flex flex-column justify-content-center">
+          <div class="mb-4 text-center text-lg-start d-lg-none">
+            <h3 class="fw-bold text-primary mb-1">Apex Credit System</h3>
+            <p class="text-muted">Enter credentials to sign in</p>
+          </div>
+          
+          <div class="mb-4 d-none d-lg-block">
+            <h3 class="fw-bold text-dark mb-1">Welcome Back</h3>
+            <p class="text-muted">Select your portal role and authenticate</p>
+          </div>
+
+          <!-- Portal Toggle Pills -->
+          <ul class="nav nav-pills nav-fill mb-4 p-1 bg-light rounded-3" id="portalTabs" style="font-size: 0.9rem; border: 1px solid var(--border-color);">
+            <li class="nav-item">
+              <button class="nav-link active py-2 border-0 fw-semibold" id="staff-tab-btn" onclick="switchPortalTab('staff')" type="button">
+                <i class="bi bi-shield-lock me-1.5"></i>Bank Staff
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link py-2 border-0 fw-semibold" id="customer-tab-btn" onclick="switchPortalTab('customer')" type="button">
+                <i class="bi bi-people me-1.5"></i>Customer Portal
+              </button>
+            </li>
+          </ul>
+
+          <!-- Staff Login Container -->
+          <div id="staffLoginSection">
+            <form id="staffLoginForm" class="needs-validation" novalidate>
+              <div class="mb-3">
+                <label for="employeeEmail" class="form-label">Work Email / User ID</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope text-muted"></i></span>
+                  <input type="email" class="form-control border-start-0" id="employeeEmail" placeholder="name@bank.com" required value="marcus.vance@bank.com">
+                </div>
+                <div class="invalid-feedback">Please enter a valid work email.</div>
+              </div>
+
+              <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                  <label for="employeePassword" class="form-label mb-0">Password</label>
+                  <a href="#" class="text-decoration-none text-primary fs-7"><small>Forgot password?</small></a>
+                </div>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-muted"></i></span>
+                  <input type="password" class="form-control border-start-0" id="employeePassword" placeholder="••••••••" required value="password123">
+                </div>
+                <div class="invalid-feedback">Password is required.</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="employeeRole" class="form-label">Access Role</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-person-workspace text-muted"></i></span>
+                  <select class="form-select border-start-0" id="employeeRole" required>
+                    <option value="" disabled>Select your portal role...</option>
+                    <option value="officer">Loan Officer (Origination)</option>
+                    <option value="analyst">Underwriter / Risk Analyst</option>
+                    <option value="manager" selected>Branch Manager (Approval)</option>
+                    <option value="admin">System Administrator</option>
+                  </select>
+                </div>
+                <div class="invalid-feedback">Please select your portal role.</div>
+              </div>
+
+              <div class="mb-4 d-flex justify-content-between align-items-center">
+                <div class="form-check">
+                  <input type="checkbox" class="form-check-input" id="rememberMe">
+                  <label class="form-check-label text-muted fs-7" for="rememberMe">Remember device (30 days)</label>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100 py-2.5 mb-3">
+                Secure Sign In <i class="bi bi-arrow-right-short ms-1"></i>
+              </button>
+
+              <div class="text-center">
+                <span class="text-muted fs-7">Or sign in with</span>
+                <hr class="my-3 text-muted opacity-25">
+                <button type="button" class="btn btn-outline-secondary w-100 fs-7 py-2">
+                  <i class="bi bi-microsoft me-2 text-primary"></i> Windows Active Directory SSO
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Customer Login Container -->
+          <div id="customerLoginSection" class="d-none">
+            <form id="customerLoginForm" class="needs-validation" novalidate>
+              <div class="mb-3">
+                <label for="customerSelect" class="form-label">Select Demo Customer Profile</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-person-circle text-muted"></i></span>
+                  <select class="form-select border-start-0" id="customerSelect" required>
+                    <option value="" disabled selected>Choose active customer...</option>
+                  </select>
+                </div>
+                <div class="invalid-feedback">Please select a customer profile.</div>
+                <div class="form-text small text-muted">Select an existing customer to log into their dashboard.</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="customerPassword" class="form-label">Password</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-muted"></i></span>
+                  <input type="password" class="form-control border-start-0" id="customerPassword" placeholder="••••••••" required value="password123">
+                </div>
+                <div class="invalid-feedback">Password is required.</div>
+              </div>
+
+              <div class="mb-4">
+                <div class="form-check">
+                  <input type="checkbox" class="form-check-input" id="customerRemember">
+                  <label class="form-check-label text-muted fs-7" for="customerRemember">Remember this browser</label>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-secondary w-100 py-2.5 mb-3" style="background-color: var(--primary-color); border-color: var(--primary-color);">
+                Customer Access <i class="bi bi-box-arrow-in-right ms-1"></i>
+              </button>
+
+              <div class="text-center pt-2 border-top">
+                <span class="text-muted fs-7 d-block mb-2">New to Apex Credit?</span>
+                <a href="customer-dashboard.html?register=true" class="btn btn-outline-secondary w-100 fs-7 py-2">
+                  <i class="bi bi-person-plus me-1 text-primary"></i> Create Customer Profile & Apply
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 Bundle JS (Includes Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <style>
+    .fs-7 { font-size: 0.8rem; }
+    .tracking-tight { letter-spacing: -0.025em; }
+  </style>
+
+  <script>
+    // Tab Toggler for Staff and Customer forms
+    function switchPortalTab(portalType) {
+      const staffBtn = document.getElementById('staff-tab-btn');
+      const custBtn = document.getElementById('customer-tab-btn');
+      const staffSec = document.getElementById('staffLoginSection');
+      const custSec = document.getElementById('customerLoginSection');
+
+      if (portalType === 'staff') {
+        staffBtn.classList.add('active');
+        custBtn.classList.remove('active');
+        staffSec.classList.remove('d-none');
+        custSec.classList.add('d-none');
+      } else {
+        staffBtn.classList.remove('active');
+        custBtn.classList.add('active');
+        staffSec.classList.add('d-none');
+        custSec.classList.remove('d-none');
+      }
+    }
+
+    // Populate Customer demo accounts select
+    document.addEventListener('DOMContentLoaded', () => {
+      const customerSelect = document.getElementById('customerSelect');
+      if (customerSelect && window.db) {
+        const customers = window.db.getCustomers();
+        customers.forEach(cust => {
+          const opt = document.createElement('option');
+          opt.value = cust.id;
+          opt.textContent = `${cust.name} (${cust.id}) - ${cust.employment}`;
+          customerSelect.appendChild(opt);
+        });
+      }
+    });
+
+    // Form Validator & Submissions
+    (function () {
+      'use strict'
+      
+      const staffForm = document.getElementById('staffLoginForm');
+      const customerForm = document.getElementById('customerLoginForm');
+
+      // Staff Form Submission
+      if (staffForm) {
+        staffForm.addEventListener('submit', function (event) {
+          event.preventDefault();
+          if (!staffForm.checkValidity()) {
+            event.stopPropagation();
+            staffForm.classList.add('was-validated');
+            return;
+          }
+
+          const email = document.getElementById('employeeEmail').value;
+          const roleVal = document.getElementById('employeeRole').value;
+          
+          let roleName = "Branch Manager";
+          if (roleVal === "officer") roleName = "Loan Officer";
+          else if (roleVal === "analyst") roleName = "Underwriter / Risk Analyst";
+          else if (roleVal === "admin") roleName = "System Administrator";
+
+          // Set active employee session
+          window.db.setCurrentUser({
+            name: "Marcus Vance",
+            email: email,
+            roleCode: roleVal,
+            role: roleName,
+            type: "staff"
+          });
+
+          window.location.href = "dashboard.html";
+        });
+      }
+
+      // Customer Form Submission
+      if (customerForm) {
+        customerForm.addEventListener('submit', function (event) {
+          event.preventDefault();
+          if (!customerForm.checkValidity()) {
+            event.stopPropagation();
+            customerForm.classList.add('was-validated');
+            return;
+          }
+
+          const customerId = document.getElementById('customerSelect').value;
+          const customer = window.db.getCustomer(customerId);
+
+          if (customer) {
+            // Set active customer session
+            window.db.setCurrentUser({
+              ...customer,
+              type: "customer"
+            });
+            window.location.href = "customer-dashboard.html";
+          }
+        });
+      }
+    })()
+  </script>
+</body>
+</html>

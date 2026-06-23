@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Catalog - Apex Credit System</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Custom Styles -->
+  <link href="assets/css/style.css" rel="stylesheet">
+  <!-- Local Database Script -->
+  <script src="assets/js/db.js"></script>
+</head>
+<body>
+
+  <!-- SIDEBAR PARTIAL (REUSABLE) -->
+  <div class="sidebar" id="sidebar">
+    <div class="brand">
+      <span class="bg-primary text-white rounded-2 p-1.5 d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+        <i class="bi bi-shield-lock-fill fs-6 text-info"></i>
+      </span>
+      <span class="text-white fw-bold mb-0">Apex Credit</span>
+    </div>
+    
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">
+        <i class="bi bi-grid-1x2-fill"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="applications-queue.html" class="nav-link">
+        <i class="bi bi-file-earmark-text"></i>
+        <span>Applications Queue</span>
+      </a>
+      <a href="customers.html" class="nav-link">
+        <i class="bi bi-people"></i>
+        <span>Customer Directory</span>
+      </a>
+      <a href="loan-products.html" class="nav-link active">
+        <i class="bi bi-tags"></i>
+        <span>Product Catalog</span>
+      </a>
+      <a href="new-application.html" class="nav-link">
+        <i class="bi bi-plus-circle"></i>
+        <span>New Application</span>
+      </a>
+      
+      <div class="text-uppercase text-xs text-muted px-3 mt-4 mb-2" style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em;">Admin Controls</div>
+      
+      <a href="admin-users.html" class="nav-link">
+        <i class="bi bi-shield-lock"></i>
+        <span>User Management</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="d-flex align-items-center">
+        <div class="bg-primary text-white rounded-circle p-2 me-2 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+          <i class="bi bi-person-fill text-info"></i>
+        </div>
+        <div class="overflow-hidden me-auto" style="line-height: 1.2;">
+          <div class="text-white fw-semibold text-truncate" style="font-size: 0.85rem;">Marcus Vance</div>
+          <small class="text-muted" style="font-size: 0.75rem;">Branch Manager</small>
+        </div>
+        <a href="login.html" class="text-danger fs-5 ms-2" title="Log Out">
+          <i class="bi bi-box-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <div class="main-wrapper">
+    <!-- TOP NAVBAR -->
+    <nav class="top-navbar">
+      <div class="d-flex align-items-center">
+        <button class="btn btn-link text-dark p-0 me-3 d-lg-none" id="sidebarToggle">
+          <i class="bi bi-list fs-3"></i>
+        </button>
+        <h4 class="mb-0 fw-semibold text-dark">Loan Products</h4>
+      </div>
+
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-link position-relative text-secondary p-1" title="Alerts">
+          <i class="bi bi-bell fs-5"></i>
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-white" style="font-size: 0.6rem; padding: 0.25em 0.5em;">
+            3
+          </span>
+        </button>
+        <div class="border-start h-25" style="width: 1px; min-height: 24px;"></div>
+        <div class="dropdown">
+          <button class="btn d-flex align-items-center gap-2 p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="d-none d-md-inline text-dark fw-medium" style="font-size: 0.9rem;">Marcus Vance</span>
+            <i class="bi bi-chevron-down text-muted fs-8"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow-sm border-light">
+            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2 text-muted"></i> Profile Settings</a></li>
+            <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2 text-muted"></i> System Preferences</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="login.html"><i class="bi bi-box-arrow-right me-2"></i> Log Out</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content-container">
+      
+      <!-- Top Action Bar -->
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+          <h2 class="fw-bold mb-1">Loan Products Catalog</h2>
+          <p class="text-muted mb-0">View interest rates, credit guidelines, thresholds, and limits of offered financial products.</p>
+        </div>
+        <div>
+          <button class="btn btn-primary d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#newProductModal">
+            <i class="bi bi-plus-lg"></i> Add Loan Product
+          </button>
+        </div>
+      </div>
+
+      <!-- LOAN PRODUCTS LIST TABLE -->
+      <div class="card">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <!-- 
+              COMMENT FOR BACKEND DEVELOPERS:
+              Loop over loan products from database to populate this catalog table.
+            -->
+            <table class="table table-hover align-middle">
+              <thead>
+                <tr>
+                  <th>Product ID</th>
+                  <th>Product Name & Class</th>
+                  <th>Interest Rate (%)</th>
+                  <th>Borrowing Range ($)</th>
+                  <th>Tenure Range (Months)</th>
+                  <th>Risk Threshold</th>
+                  <th>Status</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="productsTableBody">
+                <tr>
+                  <td class="fw-bold text-primary">PROD-HOME-01</td>
+                  <td>
+                    <div class="fw-semibold">Apex Home Mortgage</div>
+                    <small class="text-muted">Retail Banking (Secured)</small>
+                  </td>
+                  <td>
+                    <div class="fw-semibold">3.8% – 5.5%</div>
+                    <small class="text-muted">Adjustable/Fixed options</small>
+                  </td>
+                  <td>
+                    <div class="fw-medium">$100,000 – $1,500,000</div>
+                  </td>
+                  <td>120 – 360 <small class="text-muted">(10-30 yrs)</small></td>
+                  <td><span class="badge bg-success-subtle text-success">Min Score 650</span></td>
+                  <td><span class="badge bg-success text-white rounded-pill px-2.5 py-1">Active</span></td>
+                  <td class="text-end">
+                    <div class="btn-group btn-group-sm">
+                      <button class="btn btn-outline-secondary" title="Edit Product"><i class="bi bi-pencil"></i></button>
+                      <a href="new-application.html?productId=PROD-HOME-01" class="btn btn-outline-primary" title="Initiate Application"><i class="bi bi-file-earmark-plus"></i> Apply</a>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="fw-bold text-primary">PROD-AUTO-01</td>
+                  <td>
+                    <div class="fw-semibold">Apex Auto Finance</div>
+                    <small class="text-muted">Retail Banking (Secured)</small>
+                  </td>
+                  <td>
+                    <div class="fw-semibold">4.5% – 7.5%</div>
+                    <small class="text-muted">Fixed interest rate</small>
+                  </td>
+                  <td>
+                    <div class="fw-medium">$10,000 – $100,000</div>
+                  </td>
+                  <td>24 – 84 <small class="text-muted">(2-7 yrs)</small></td>
+                  <td><span class="badge bg-success-subtle text-success">Min Score 600</span></td>
+                  <td><span class="badge bg-success text-white rounded-pill px-2.5 py-1">Active</span></td>
+                  <td class="text-end">
+                    <div class="btn-group btn-group-sm">
+                      <button class="btn btn-outline-secondary"><i class="bi bi-pencil"></i></button>
+                      <a href="new-application.html?productId=PROD-AUTO-01" class="btn btn-outline-primary"><i class="bi bi-file-earmark-plus"></i> Apply</a>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="fw-bold text-primary">PROD-PERS-01</td>
+                  <td>
+                    <div class="fw-semibold">Apex Personal Loan</div>
+                    <small class="text-muted">Retail Banking (Unsecured)</small>
+                  </td>
+                  <td>
+                    <div class="fw-semibold">10.5% – 15.0%</div>
+                    <small class="text-muted">Risk-based pricing</small>
+                  </td>
+                  <td>
+                    <div class="fw-medium">$5,000 – $50,000</div>
+                  </td>
+                  <td>12 – 60 <small class="text-muted">(1-5 yrs)</small></td>
+                  <td><span class="badge bg-warning-subtle text-warning">Min Score 680</span></td>
+                  <td><span class="badge bg-success text-white rounded-pill px-2.5 py-1">Active</span></td>
+                  <td class="text-end">
+                    <div class="btn-group btn-group-sm">
+                      <button class="btn btn-outline-secondary"><i class="bi bi-pencil"></i></button>
+                      <a href="new-application.html?productId=PROD-PERS-01" class="btn btn-outline-primary"><i class="bi bi-file-earmark-plus"></i> Apply</a>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="fw-bold text-primary">PROD-BUSN-01</td>
+                  <td>
+                    <div class="fw-semibold">Business Growth Financing</div>
+                    <small class="text-muted">Commercial Banking (Unsecured)</small>
+                  </td>
+                  <td>
+                    <div class="fw-semibold">6.0% – 9.5%</div>
+                    <small class="text-muted">Floating rate options</small>
+                  </td>
+                  <td>
+                    <div class="fw-medium">$50,000 – $500,000</div>
+                  </td>
+                  <td>36 – 120 <small class="text-muted">(3-10 yrs)</small></td>
+                  <td><span class="badge bg-danger-subtle text-danger">Min Score 700</span></td>
+                  <td><span class="badge bg-success text-white rounded-pill px-2.5 py-1">Active</span></td>
+                  <td class="text-end">
+                    <div class="btn-group btn-group-sm">
+                      <button class="btn btn-outline-secondary"><i class="bi bi-pencil"></i></button>
+                      <a href="new-application.html?productId=PROD-BUSN-01" class="btn btn-outline-primary"><i class="bi bi-file-earmark-plus"></i> Apply</a>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="fw-bold text-primary">PROD-BRID-02</td>
+                  <td>
+                    <div class="fw-semibold">Apex Bridge Financing</div>
+                    <small class="text-muted">Commercial Banking (Temporary)</small>
+                  </td>
+                  <td>
+                    <div class="fw-semibold">12.0% – 14.5%</div>
+                    <small class="text-muted">Interest-only term</small>
+                  </td>
+                  <td>
+                    <div class="fw-medium">$25,000 – $250,000</div>
+                  </td>
+                  <td>6 – 24 <small class="text-muted">(0.5-2 yrs)</small></td>
+                  <td><span class="badge bg-warning-subtle text-warning">Min Score 670</span></td>
+                  <td><span class="badge bg-secondary text-white rounded-pill px-2.5 py-1">Inactive</span></td>
+                  <td class="text-end">
+                    <div class="btn-group btn-group-sm">
+                      <button class="btn btn-outline-secondary"><i class="bi bi-pencil"></i></button>
+                      <button class="btn btn-outline-primary" disabled><i class="bi bi-file-earmark-plus"></i> Apply</button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ADD PRODUCT MODAL -->
+  <div class="modal fade" id="newProductModal" tabindex="-1" aria-labelledby="newProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold text-dark" id="newProductModalLabel">Add Loan Product Configuration</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form class="needs-validation" novalidate id="newProductForm">
+          <div class="modal-body">
+            
+            <div class="row g-3">
+              <!-- Name -->
+              <div class="col-md-6">
+                <label for="pName" class="form-label">Product Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="pName" placeholder="e.g. Apex Agri Loans" required>
+                <div class="invalid-feedback">Please enter product name.</div>
+              </div>
+              <!-- Class -->
+              <div class="col-md-6">
+                <label for="pClass" class="form-label">Product Classification <span class="text-danger">*</span></label>
+                <select class="form-select" id="pClass" required>
+                  <option value="" disabled selected>Select class...</option>
+                  <option value="retail_sec">Retail - Secured</option>
+                  <option value="retail_unsec">Retail - Unsecured</option>
+                  <option value="comm_sec">Commercial - Secured</option>
+                  <option value="comm_unsec">Commercial - Unsecured</option>
+                </select>
+                <div class="invalid-feedback">Please select product class.</div>
+              </div>
+              
+              <!-- Interest range -->
+              <div class="col-md-6">
+                <label for="pInterestMin" class="form-label">Min Interest Rate (%) <span class="text-danger">*</span></label>
+                <input type="number" step="0.01" class="form-control" id="pInterestMin" placeholder="4.50" required>
+                <div class="invalid-feedback">Enter min interest rate.</div>
+              </div>
+              <div class="col-md-6">
+                <label for="pInterestMax" class="form-label">Max Interest Rate (%) <span class="text-danger">*</span></label>
+                <input type="number" step="0.01" class="form-control" id="pInterestMax" placeholder="9.50" required>
+                <div class="invalid-feedback">Enter max interest rate.</div>
+              </div>
+
+              <!-- Borrowing amount range -->
+              <div class="col-md-6">
+                <label for="pAmountMin" class="form-label">Min Borrowing Amount ($) <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" id="pAmountMin" placeholder="10000" required>
+                <div class="invalid-feedback">Enter min amount.</div>
+              </div>
+              <div class="col-md-6">
+                <label for="pAmountMax" class="form-label">Max Borrowing Amount ($) <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" id="pAmountMax" placeholder="500000" required>
+                <div class="invalid-feedback">Enter max amount.</div>
+              </div>
+
+              <!-- Tenure range -->
+              <div class="col-md-6">
+                <label for="pTenureMin" class="form-label">Min Tenure (Months) <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" id="pTenureMin" placeholder="12" required>
+                <div class="invalid-feedback">Enter min tenure.</div>
+              </div>
+              <div class="col-md-6">
+                <label for="pTenureMax" class="form-label">Max Tenure (Months) <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" id="pTenureMax" placeholder="120" required>
+                <div class="invalid-feedback">Enter max tenure.</div>
+              </div>
+
+              <!-- Credit guidelines -->
+              <div class="col-md-6">
+                <label for="pMinScore" class="form-label">Min Bureau Credit Score <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" id="pMinScore" placeholder="600" required>
+                <div class="invalid-feedback">Enter min score.</div>
+              </div>
+              <div class="col-md-6">
+                <label for="pStatus" class="form-label">Initial Status <span class="text-danger">*</span></label>
+                <select class="form-select" id="pStatus" required>
+                  <option value="active">Active (Available for loans)</option>
+                  <option value="inactive">Inactive (Disabled)</option>
+                </select>
+              </div>
+            </div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Create Configuration</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Responsive sidebar toggler
+    const toggleBtn = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    if (toggleBtn && sidebar) {
+      toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('show');
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderProducts();
+      setupForm();
+    });
+
+    function renderProducts() {
+      if (!window.db) return;
+
+      const products = window.db.getProducts();
+      const tbody = document.getElementById('productsTableBody');
+      tbody.innerHTML = '';
+
+      products.forEach(prod => {
+        const isStatusActive = prod.status === 'Active';
+        const badgeClass = isStatusActive ? 'bg-success text-white' : 'bg-secondary text-white';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="fw-bold text-primary">${prod.id}</td>
+          <td>
+            <div class="fw-semibold">${prod.name}</div>
+            <small class="text-muted">${prod.classification}</small>
+          </td>
+          <td>
+            <div class="fw-semibold">${prod.rateMin}% – ${prod.rateMax}%</div>
+            <small class="text-muted">Adjustable/Fixed options</small>
+          </td>
+          <td>
+            <div class="fw-medium">$${prod.amountMin.toLocaleString()} – $${prod.amountMax.toLocaleString()}</div>
+          </td>
+          <td>${prod.tenureMin} – ${prod.tenureMax} <small class="text-muted">months</small></td>
+          <td><span class="badge bg-success-subtle text-success">Min Score ${prod.minScore}</span></td>
+          <td><span class="badge ${badgeClass} rounded-pill px-2.5 py-1">${prod.status}</span></td>
+          <td class="text-end">
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline-secondary" title="Edit Product"><i class="bi bi-pencil"></i></button>
+              <a href="new-application.html?productId=${prod.id}" class="btn btn-outline-primary ${isStatusActive ? '' : 'disabled'}" title="Initiate Application"><i class="bi bi-file-earmark-plus"></i> Apply</a>
+            </div>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function setupForm() {
+      const form = document.getElementById('newProductForm');
+      if (form) {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          if (!form.checkValidity()) {
+            e.stopPropagation();
+            form.classList.add('was-validated');
+            return;
+          }
+
+          const name = document.getElementById('pName').value;
+          const classificationSelect = document.getElementById('pClass');
+          const classification = classificationSelect.options[classificationSelect.selectedIndex].text;
+          const rateMin = parseFloat(document.getElementById('pInterestMin').value);
+          const rateMax = parseFloat(document.getElementById('pInterestMax').value);
+          const amountMin = parseFloat(document.getElementById('pAmountMin').value);
+          const amountMax = parseFloat(document.getElementById('pAmountMax').value);
+          const tenureMin = parseInt(document.getElementById('pTenureMin').value);
+          const tenureMax = parseInt(document.getElementById('pTenureMax').value);
+          const minScore = parseInt(document.getElementById('pMinScore').value);
+          
+          const statusVal = document.getElementById('pStatus').value;
+          const status = statusVal === 'active' ? 'Active' : 'Inactive';
+
+          const prefix = name.split(' ')[0].slice(0, 4).toUpperCase();
+          const rand = Math.floor(10 + Math.random() * 90);
+          const id = `PROD-${prefix}-${rand}`;
+
+          const product = {
+            id: id,
+            name: name,
+            classification: classification,
+            rateMin: rateMin,
+            rateMax: rateMax,
+            amountMin: amountMin,
+            amountMax: amountMax,
+            tenureMin: tenureMin,
+            tenureMax: tenureMax,
+            minScore: minScore,
+            status: status,
+            description: "Custom corporate configured credit product."
+          };
+
+          window.db.addProduct(product);
+          
+          // Reset form, hide modal, refresh catalog
+          form.reset();
+          form.classList.remove('was-validated');
+          const modalInstance = bootstrap.Modal.getInstance(document.getElementById('newProductModal'));
+          modalInstance.hide();
+          
+          renderProducts();
+        });
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Information Form - Apex Credit System</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Custom Styles -->
+  <link href="assets/css/style.css" rel="stylesheet">
+  <!-- Local Database Script -->
+  <script src="assets/js/db.js"></script>
+</head>
+<body>
+
+  <!-- SIDEBAR PARTIAL (REUSABLE) -->
+  <div class="sidebar" id="sidebar">
+    <div class="brand">
+      <span class="bg-primary text-white rounded-2 p-1.5 d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+        <i class="bi bi-shield-lock-fill fs-6 text-info"></i>
+      </span>
+      <span class="text-white fw-bold mb-0">Apex Credit</span>
+    </div>
+    
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">
+        <i class="bi bi-grid-1x2-fill"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="applications-queue.html" class="nav-link">
+        <i class="bi bi-file-earmark-text"></i>
+        <span>Applications Queue</span>
+      </a>
+      <a href="customers.html" class="nav-link active">
+        <i class="bi bi-people"></i>
+        <span>Customer Directory</span>
+      </a>
+      <a href="loan-products.html" class="nav-link">
+        <i class="bi bi-tags"></i>
+        <span>Product Catalog</span>
+      </a>
+      <a href="new-application.html" class="nav-link">
+        <i class="bi bi-plus-circle"></i>
+        <span>New Application</span>
+      </a>
+      
+      <div class="text-uppercase text-xs text-muted px-3 mt-4 mb-2" style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em;">Admin Controls</div>
+      
+      <a href="admin-users.html" class="nav-link">
+        <i class="bi bi-shield-lock"></i>
+        <span>User Management</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="d-flex align-items-center">
+        <div class="bg-primary text-white rounded-circle p-2 me-2 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+          <i class="bi bi-person-fill text-info"></i>
+        </div>
+        <div class="overflow-hidden me-auto" style="line-height: 1.2;">
+          <div class="text-white fw-semibold text-truncate" style="font-size: 0.85rem;">Marcus Vance</div>
+          <small class="text-muted" style="font-size: 0.75rem;">Branch Manager</small>
+        </div>
+        <a href="login.html" class="text-danger fs-5 ms-2" title="Log Out">
+          <i class="bi bi-box-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <div class="main-wrapper">
+    <!-- TOP NAVBAR -->
+    <nav class="top-navbar">
+      <div class="d-flex align-items-center">
+        <button class="btn btn-link text-dark p-0 me-3 d-lg-none" id="sidebarToggle">
+          <i class="bi bi-list fs-3"></i>
+        </button>
+        <h4 class="mb-0 fw-semibold text-dark">Customer Profiles</h4>
+      </div>
+
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-link position-relative text-secondary p-1" title="Alerts">
+          <i class="bi bi-bell fs-5"></i>
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-white" style="font-size: 0.6rem; padding: 0.25em 0.5em;">
+            3
+          </span>
+        </button>
+        <div class="border-start h-25" style="width: 1px; min-height: 24px;"></div>
+        <div class="dropdown">
+          <button class="btn d-flex align-items-center gap-2 p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="d-none d-md-inline text-dark fw-medium" style="font-size: 0.9rem;">Marcus Vance</span>
+            <i class="bi bi-chevron-down text-muted fs-8"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow-sm border-light">
+            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2 text-muted"></i> Profile Settings</a></li>
+            <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2 text-muted"></i> System Preferences</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="login.html"><i class="bi bi-box-arrow-right me-2"></i> Log Out</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content-container">
+      
+      <!-- Page Header -->
+      <div class="mb-4">
+        <a href="customers.html" class="btn btn-link text-decoration-none p-0 mb-2"><i class="bi bi-arrow-left me-1"></i> Back to Customer Directory</a>
+        
+        <!-- 
+          COMMENT FOR BACKEND DEVELOPERS:
+          Use query params (e.g. ?id=CUST-1049) to determine header/form behavior.
+          Show "Edit Customer Profile" if customer ID is present; else show "Register New Customer".
+        -->
+        <h2 class="fw-bold mb-1" id="formHeaderTitle">Register New Customer</h2>
+        <p class="text-muted mb-0">Input the verified personal details and financial metrics of the applicant customer.</p>
+      </div>
+
+      <!-- Main Form Card -->
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="card mb-4">
+            <div class="card-header bg-white py-3 border-bottom">
+              <h5 class="mb-0 fw-bold text-dark">Personal & Financial Information</h5>
+            </div>
+            <div class="card-body">
+              
+              <form action="customers.html" method="POST" class="needs-validation" novalidate id="customerForm">
+                <!-- 
+                  COMMENT FOR BACKEND DEVELOPERS:
+                  Add hidden customer ID field for edit request:
+                  <input type="hidden" name="id" value="CUST-1049" />
+                -->
+                
+                <!-- Section: Personal Details -->
+                <h6 class="text-uppercase text-xs text-primary fw-bold tracking-wider mb-3">1. Personal Information</h6>
+                
+                <div class="row g-3 mb-4">
+                  <!-- Full Name -->
+                  <div class="col-md-6">
+                    <label for="fullName" class="form-label">Full Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="fullName" placeholder="e.g. Jane Doe" required>
+                    <div class="invalid-feedback">Full name is required.</div>
+                  </div>
+                  
+                  <!-- DOB -->
+                  <div class="col-md-6">
+                    <label for="dob" class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="dob" required>
+                    <div class="invalid-feedback">Please select a valid date of birth.</div>
+                  </div>
+
+                  <!-- Email -->
+                  <div class="col-md-6">
+                    <label for="emailAddress" class="form-label">Email Address <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" id="emailAddress" placeholder="jane.doe@email.com" required>
+                    <div class="invalid-feedback">Please enter a valid email address.</div>
+                  </div>
+
+                  <!-- Phone Number -->
+                  <div class="col-md-6">
+                    <label for="phoneNumber" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                    <input type="tel" class="form-control" id="phoneNumber" placeholder="+1 (555) 000-0000" required>
+                    <div class="invalid-feedback">Please enter a valid phone number.</div>
+                  </div>
+                </div>
+
+                <!-- Section: Address -->
+                <h6 class="text-uppercase text-xs text-primary fw-bold tracking-wider mb-3">2. Residential Address</h6>
+                <div class="row g-3 mb-4">
+                  <!-- Street Address -->
+                  <div class="col-12">
+                    <label for="streetAddress" class="form-label">Street Address <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="streetAddress" placeholder="123 Financial Way, Apt 4B" required>
+                    <div class="invalid-feedback">Street address is required.</div>
+                  </div>
+
+                  <!-- City -->
+                  <div class="col-md-4">
+                    <label for="city" class="form-label">City <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="city" required>
+                    <div class="invalid-feedback">City is required.</div>
+                  </div>
+
+                  <!-- State / Province -->
+                  <div class="col-md-4">
+                    <label for="state" class="form-label">State / Province <span class="text-danger">*</span></label>
+                    <select class="form-select" id="state" required>
+                      <option value="" disabled selected>Select state...</option>
+                      <option value="NY">New York</option>
+                      <option value="CA">California</option>
+                      <option value="TX">Texas</option>
+                      <option value="FL">Florida</option>
+                      <option value="IL">Illinois</option>
+                    </select>
+                    <div class="invalid-feedback">Please select a state.</div>
+                  </div>
+
+                  <!-- Zip / Postal Code -->
+                  <div class="col-md-4">
+                    <label for="zipCode" class="form-label">Zip / Postal Code <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="zipCode" placeholder="10001" required>
+                    <div class="invalid-feedback">Valid Zip code required.</div>
+                  </div>
+                </div>
+
+                <!-- Section: Employment & Financials -->
+                <h6 class="text-uppercase text-xs text-primary fw-bold tracking-wider mb-3">3. Employment & Financial Status</h6>
+                <div class="row g-3 mb-4">
+                  <!-- Employment Type Dropdown -->
+                  <div class="col-md-6">
+                    <label for="employmentType" class="form-label">Employment Type <span class="text-danger">*</span></label>
+                    <select class="form-select" id="employmentType" required>
+                      <option value="" disabled selected>Select type...</option>
+                      <option value="salaried">Salaried (Full-Time / Part-Time)</option>
+                      <option value="self_employed">Self-Employed / Freelancer</option>
+                      <option value="business_owner">Business Owner / Partner</option>
+                      <option value="unemployed">Unemployed / Pensioner</option>
+                    </select>
+                    <div class="invalid-feedback">Please select employment type.</div>
+                  </div>
+
+                  <!-- Monthly Income -->
+                  <div class="col-md-6">
+                    <label for="monthlyIncome" class="form-label">Monthly Gross Income ($) <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light">$</span>
+                      <input type="number" class="form-control" id="monthlyIncome" placeholder="e.g. 7500" min="0" required>
+                    </div>
+                    <div class="invalid-feedback">Please enter a valid monthly income.</div>
+                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="border-top pt-3 d-flex justify-content-end gap-2">
+                  <a href="customers.html" class="btn btn-outline-secondary">Cancel</a>
+                  <button type="submit" class="btn btn-primary" id="saveBtn">Save Customer Record</button>
+                </div>
+
+              </form>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar helper info panel -->
+        <div class="col-lg-4">
+          <div class="card mb-4 bg-light border-0 shadow-none">
+            <div class="card-body">
+              <h5 class="fw-bold mb-3"><i class="bi bi-info-circle text-primary me-2"></i>KYC Requirements</h5>
+              <p class="small text-muted">All registered customers must undergo identity verification during loan processing. Ensure the details match official documents:</p>
+              
+              <ul class="small text-muted ps-3">
+                <li class="mb-2"><strong>Full Name</strong> must match government-issued photo identification (Passport, Driving License).</li>
+                <li class="mb-2"><strong>Date of Birth</strong> check ensures applicant is of legal contracting age (18+).</li>
+                <li class="mb-2"><strong>Gross Monthly Income</strong> must be verifiable via payslips, tax returns, or bank statements.</li>
+              </ul>
+            </div>
+          </div>
+          
+          <!-- Mock Edit State Sidebar Info (Only visible in edit mode) -->
+          <!-- 
+            COMMENT FOR BACKEND DEVELOPERS:
+            Render this card dynamically when editing an existing customer.
+          -->
+          <div class="card border-warning-subtle" id="editStatusCard" style="display: none;">
+            <div class="card-body">
+              <h6 class="fw-bold text-dark mb-2">Customer Audit Log</h6>
+              <div class="small text-muted mb-1">ID: <span class="fw-semibold text-primary">CUST-1049</span></div>
+              <div class="small text-muted mb-1">Created: <span class="fw-medium">Jun 20, 2026, 09:30 AM</span></div>
+              <div class="small text-muted mb-3">Last Modified: <span class="fw-medium">Jun 20, 2026, 11:45 AM</span></div>
+              
+              <div class="d-flex align-items-center justify-content-between p-2.5 bg-light rounded-3">
+                <span class="small fw-semibold text-muted">KYC Status:</span>
+                <span class="badge-status badge-verified"><i class="bi bi-patch-check-fill me-1"></i>Verified</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Responsive sidebar toggler
+    const toggleBtn = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    if (toggleBtn && sidebar) {
+      toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('show');
+      });
+    }
+
+    let editCustomerId = null;
+
+    // Load customer data if query param is set
+    window.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      editCustomerId = urlParams.get('id');
+      
+      if (editCustomerId && window.db) {
+        const cust = window.db.getCustomer(editCustomerId);
+        if (cust) {
+          // Change title and headers
+          document.getElementById('formHeaderTitle').textContent = `Edit Customer: ${cust.id}`;
+          document.getElementById('saveBtn').textContent = "Update Customer Record";
+          
+          // Show the audit card
+          const auditCard = document.getElementById('editStatusCard');
+          auditCard.style.display = 'block';
+          
+          // Update values in audit card
+          auditCard.querySelector('.text-primary').textContent = cust.id;
+          auditCard.querySelector('.badge-status').innerHTML = `<i class="bi bi-patch-check-fill me-1"></i>${cust.kycStatus}`;
+
+          // Prepopulate form fields
+          document.getElementById('fullName').value = cust.name;
+          document.getElementById('dob').value = cust.dob;
+          document.getElementById('emailAddress').value = cust.email;
+          document.getElementById('phoneNumber').value = cust.phone;
+          
+          // Address mocks
+          document.getElementById('streetAddress').value = "123 Financial Way, Apt 4B";
+          document.getElementById('city').value = "New York";
+          document.getElementById('state').value = "NY";
+          document.getElementById('zipCode').value = "10001";
+          
+          document.getElementById('employmentType').value = cust.employment.toLowerCase().replace(' ', '_');
+          document.getElementById('monthlyIncome').value = cust.income;
+        }
+      }
+    });
+
+    // Form validation and submit handler
+    (function () {
+      'use strict'
+      const form = document.getElementById('customerForm');
+      if (form) {
+        form.addEventListener('submit', function (event) {
+          event.preventDefault();
+          if (!form.checkValidity()) {
+            event.stopPropagation();
+            form.classList.add('was-validated');
+            return;
+          }
+
+          const name = document.getElementById('fullName').value;
+          const dob = document.getElementById('dob').value;
+          const email = document.getElementById('emailAddress').value;
+          const phone = document.getElementById('phoneNumber').value;
+          
+          const employmentSelect = document.getElementById('employmentType');
+          const employment = employmentSelect.options[employmentSelect.selectedIndex].text.split(' (')[0];
+          const income = parseFloat(document.getElementById('monthlyIncome').value) || 0;
+
+          if (editCustomerId) {
+            // Edit Mode: Update existing customer
+            const customers = window.db.getCustomers();
+            const idx = customers.findIndex(c => c.id === editCustomerId);
+            if (idx !== -1) {
+              customers[idx].name = name;
+              customers[idx].dob = dob;
+              customers[idx].email = email;
+              customers[idx].phone = phone;
+              customers[idx].employment = employment;
+              customers[idx].income = income;
+              localStorage.setItem("apex_customers", JSON.stringify(customers));
+            }
+          } else {
+            // Register Mode: Create new customer
+            const newId = `CUST-${Math.floor(1000 + Math.random() * 9000)}`;
+            const score = Math.floor(600 + Math.random() * 220); // random FICO score on registry
+            const customer = {
+              id: newId,
+              name: name,
+              email: email,
+              phone: phone,
+              dob: dob,
+              employment: employment,
+              income: income,
+              kycStatus: "Verified",
+              registeredDate: new Date().toISOString().split('T')[0],
+              score: score
+            };
+            window.db.addCustomer(customer);
+          }
+
+          window.location.href = "customers.html";
+        });
+      }
+    })()
+  </script>
+</body>
+</html>

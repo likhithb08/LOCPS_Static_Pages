@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Dashboard - Apex Credit System</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Custom Styles -->
+  <link href="assets/css/style.css" rel="stylesheet">
+  <!-- Database Script -->
+  <script src="assets/js/db.js"></script>
+  <style>
+    /* Custom stepper styles */
+    .stepper {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      margin-bottom: 2rem;
+    }
+    .stepper::before {
+      content: '';
+      position: absolute;
+      top: 24px;
+      left: 5%;
+      right: 5%;
+      height: 4px;
+      background-color: #e2e8f0;
+      z-index: 1;
+    }
+    .step-progress-bar {
+      position: absolute;
+      top: 24px;
+      left: 5%;
+      height: 4px;
+      background-color: var(--accent-color);
+      z-index: 2;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+    .step {
+      position: relative;
+      z-index: 3;
+      text-align: center;
+      width: 20%;
+    }
+    .step-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: #fff;
+      border: 3px solid #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+      font-size: 1.25rem;
+      color: #64748b;
+      transition: all 0.3s ease;
+    }
+    .step.active .step-icon {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+      box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.15);
+    }
+    .step.completed .step-icon {
+      border-color: #10b981;
+      background-color: #10b981;
+      color: #fff;
+    }
+    .step-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #475569;
+    }
+    .step.active .step-title {
+      color: var(--accent-color);
+    }
+    .step.completed .step-title {
+      color: #10b981;
+    }
+    .product-card {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 20px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.05);
+      border-color: var(--accent-color);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- REGISTRATION CONTAINER (Shown dynamically if URL has ?register=true) -->
+  <div id="registrationPage" class="container d-none py-5" style="max-width: 650px;">
+    <div class="card shadow border-0 p-4 p-md-5">
+      <div class="text-center mb-4">
+        <span class="bg-primary text-white rounded-3 p-2.5 d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+          <i class="bi bi-person-plus-fill fs-4 text-info"></i>
+        </span>
+        <h3 class="fw-bold">Create Customer Profile</h3>
+        <p class="text-muted">Register to search, check eligibility, and apply for retail credit accounts</p>
+      </div>
+
+      <form id="registerForm" class="needs-validation" novalidate>
+        <div class="row g-3">
+          <div class="col-md-12">
+            <label for="regName" class="form-label">Full Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="regName" placeholder="Eleanor Vance" required>
+            <div class="invalid-feedback">Full name is required.</div>
+          </div>
+          <div class="col-md-6">
+            <label for="regEmail" class="form-label">Email Address <span class="text-danger">*</span></label>
+            <input type="email" class="form-control" id="regEmail" placeholder="eleanor@email.com" required>
+            <div class="invalid-feedback">Valid email required.</div>
+          </div>
+          <div class="col-md-6">
+            <label for="regPhone" class="form-label">Phone Number <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="regPhone" placeholder="+1 (555) 012-3456" required>
+            <div class="invalid-feedback">Phone number is required.</div>
+          </div>
+          <div class="col-md-6">
+            <label for="regDob" class="form-label">Date of Birth <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" id="regDob" required>
+            <div class="invalid-feedback">DOB is required.</div>
+          </div>
+          <div class="col-md-6">
+            <label for="regEmployment" class="form-label">Employment Status <span class="text-danger">*</span></label>
+            <select class="form-select" id="regEmployment" required>
+              <option value="" disabled selected>Select...</option>
+              <option value="Salaried">Salaried (Full-Time)</option>
+              <option value="Self-Employed">Self-Employed</option>
+              <option value="Business Owner">Business Owner</option>
+              <option value="Unemployed">Unemployed</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="regIncome" class="form-label">Monthly Gross Income ($) <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" id="regIncome" placeholder="e.g. 6500" required>
+            <div class="invalid-feedback">Valid monthly income required.</div>
+          </div>
+          <div class="col-md-6">
+            <label for="regPassword" class="form-label">Password <span class="text-danger">*</span></label>
+            <input type="password" class="form-control" id="regPassword" placeholder="••••••••" required>
+            <div class="invalid-feedback">Password is required.</div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-2 d-grid gap-2">
+          <button type="submit" class="btn btn-primary py-2.5">
+            Submit Registration & Log In
+          </button>
+          <a href="login.html" class="btn btn-outline-secondary py-2.5">
+            Cancel and Return
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- DASHBOARD CONTAINER (Shown if customer logged in) -->
+  <div id="dashboardPage">
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <div class="brand">
+        <span class="bg-primary text-white rounded-2 p-1.5 d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+          <i class="bi bi-shield-lock-fill fs-6 text-info"></i>
+        </span>
+        <span class="text-white fw-bold mb-0">Apex Credit</span>
+      </div>
+      
+      <div class="nav-links">
+        <a href="customer-dashboard.html" class="nav-link active">
+          <i class="bi bi-grid-1x2-fill"></i>
+          <span>My Dashboard</span>
+        </a>
+        <a href="customer-apply.html" class="nav-link">
+          <i class="bi bi-plus-circle"></i>
+          <span>Apply for Loan</span>
+        </a>
+        <div class="border-top border-secondary-subtle opacity-25 my-3"></div>
+        <a href="#" onclick="handleLogout(event)" class="nav-link text-danger">
+          <i class="bi bi-box-arrow-right text-danger"></i>
+          <span>Sign Out</span>
+        </a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="d-flex align-items-center">
+          <div class="bg-primary text-white rounded-circle p-2 me-2 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+            <i class="bi bi-person-fill text-info"></i>
+          </div>
+          <div class="overflow-hidden me-auto" style="line-height: 1.2;">
+            <div id="customerLabel" class="text-white fw-semibold text-truncate" style="font-size: 0.85rem;">Eleanor Vance</div>
+            <small class="text-muted" style="font-size: 0.75rem;">Premium Customer</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <div class="main-wrapper">
+      <!-- TOP NAVBAR -->
+      <nav class="top-navbar">
+        <div class="d-flex align-items-center">
+          <button class="btn btn-link text-dark p-0 me-3 d-lg-none" id="sidebarToggle">
+            <i class="bi bi-list fs-3"></i>
+          </button>
+          <h4 class="mb-0 fw-semibold text-dark">Customer Portal</h4>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+          <button class="btn btn-link position-relative text-secondary p-1" title="Alerts">
+            <i class="bi bi-bell fs-5"></i>
+            <span id="alertCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-white" style="font-size: 0.6rem; padding: 0.25em 0.5em;">
+              1
+            </span>
+          </button>
+          <div class="border-start h-25" style="width: 1px; min-height: 24px;"></div>
+          <span id="custTopLabel" class="text-dark fw-medium" style="font-size: 0.9rem;">Eleanor Vance</span>
+        </div>
+      </nav>
+
+      <div class="content-container">
+        <!-- Welcome Banner -->
+        <div class="row g-4 mb-4">
+          <div class="col-12">
+            <div class="p-4 bg-white border rounded-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+              <div>
+                <h2 id="welcomeHeadline" class="fw-bold mb-1">Welcome Back!</h2>
+                <p class="text-muted mb-0">Browse lending rates and track your current origination requests below.</p>
+              </div>
+              <div class="d-flex gap-2">
+                <a href="customer-apply.html" class="btn btn-primary d-inline-flex align-items-center gap-2"><i class="bi bi-plus-lg"></i> Apply For Loan</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STATED METRICS -->
+        <div class="row g-3 mb-4">
+          <div class="col-sm-6 col-md-4">
+            <div class="card h-100">
+              <div class="card-body">
+                <span class="text-muted fw-medium small text-uppercase">Monthly Income</span>
+                <h3 id="metricIncome" class="fw-bold mb-1 mt-1">$0.00</h3>
+                <small class="text-muted">Employment verified</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-md-4">
+            <div class="card h-100">
+              <div class="card-body">
+                <span class="text-muted fw-medium small text-uppercase">Credit Score (FICO)</span>
+                <h3 id="metricFico" class="fw-bold mb-1 mt-1">N/A</h3>
+                <span id="metricFicoBadge" class="badge bg-secondary-subtle text-secondary">Checking Bureau...</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-md-4">
+            <div class="card h-100">
+              <div class="card-body">
+                <span class="text-muted fw-medium small text-uppercase">Submitted Applications</span>
+                <h3 id="metricAppsCount" class="fw-bold mb-1 mt-1">0</h3>
+                <small class="text-muted">Total requests registered</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MOST RECENT APPLICATION TIMELINE STEPPER -->
+        <div id="timelineCard" class="card mb-4 d-none">
+          <div class="card-header bg-white py-3 border-bottom">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-activity text-primary me-2"></i>Active Application Progress Tracker</h5>
+          </div>
+          <div class="card-body p-4">
+            <div class="text-center mb-4">
+              <span class="text-muted small">Tracking Ref:</span> <strong id="timelineAppId" class="text-primary">APP-9000</strong>
+              <span class="mx-2 text-muted">|</span>
+              <span class="text-muted">Product:</span> <strong id="timelineProdName">Apex Home Mortgage</strong>
+              <span class="mx-2 text-muted">|</span>
+              <span class="text-muted">Amount:</span> <strong id="timelineAmount">$350,000</strong>
+            </div>
+
+            <!-- Visual Stepper -->
+            <div class="stepper">
+              <div class="step-progress-bar" id="stepperProgressBar"></div>
+              
+              <div class="step" id="step1">
+                <div class="step-icon"><i class="bi bi-file-earmark-check"></i></div>
+                <div class="step-title">Submitted</div>
+              </div>
+              <div class="step" id="step2">
+                <div class="step-icon"><i class="bi bi-search"></i></div>
+                <div class="step-title">Underwriting</div>
+              </div>
+              <div class="step" id="step3">
+                <div class="step-icon"><i class="bi bi-patch-check"></i></div>
+                <div class="step-title">Approval</div>
+              </div>
+              <div class="step" id="step4">
+                <div class="step-icon"><i class="bi bi-wallet2"></i></div>
+                <div class="step-title">Disbursement</div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-light rounded-3 border text-center">
+              <span class="text-muted small d-block mb-1">Status Message:</span>
+              <span class="fw-semibold text-dark" id="timelineMessage">Your application is currently being analyzed by our underwriters.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- MY APPLICATIONS LIST -->
+        <div class="card mb-5">
+          <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-file-earmark-text text-primary me-2"></i>My Credit Applications</h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive border-0">
+              <table class="table align-middle" id="customerAppsTable">
+                <thead>
+                  <tr>
+                    <th>Application ID</th>
+                    <th>Product</th>
+                    <th>Amount Requested</th>
+                    <th>Tenure</th>
+                    <th>Submitted Date</th>
+                    <th>Status</th>
+                    <th class="text-end">Details</th>
+                  </tr>
+                </thead>
+                <tbody id="customerAppsBody">
+                  <!-- Dynamic rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRODUCTS BROWSE SECTION -->
+        <div class="mb-4">
+          <h4 class="fw-bold mb-1">Browse Premium Loan Products</h4>
+          <p class="text-muted mb-4">Select from our vetted range of personal and business financing programs and check interest guidelines.</p>
+          
+          <div class="row g-4" id="productsCatalogContainer">
+            <!-- Dynamic product cards -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLICATION DETAILS MODAL -->
+  <div class="modal fade" id="appDetailsModal" tabindex="-1" aria-labelledby="appDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold" id="appDetailsModalLabel">Loan Application Details</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-borderless table-sm">
+            <tbody>
+              <tr>
+                <td class="text-muted">Application ID:</td>
+                <td class="fw-bold text-primary" id="mAppId">-</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Loan Product:</td>
+                <td class="fw-semibold" id="mAppProduct">-</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Requested Amount:</td>
+                <td class="fw-bold text-success fs-5" id="mAppAmount">-</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Tenure Duration:</td>
+                <td id="mAppTenure">-</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Date Submitted:</td>
+                <td id="mAppDate">-</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Assigned Auditor:</td>
+                <td id="mAppAuditor">-</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Current Status:</td>
+                <td><span id="mAppBadge" class="badge-status">-</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <hr>
+          <div class="mb-2">
+            <span class="text-muted small fw-semibold">Auditor Audit Remarks:</span>
+            <div class="p-3 bg-light rounded-3 border mt-1 small" id="mAppRemarks" style="font-style: italic;">No audit remarks yet.</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Handle responsive sidebar toggling
+    const toggleBtn = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    if (toggleBtn && sidebar) {
+      toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('show');
+      });
+    }
+
+    // Switch to Registration form if query parameters demand it
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isRegister = urlParams.get('register') === 'true';
+
+      if (isRegister) {
+        document.getElementById('registrationPage').classList.remove('d-none');
+        document.getElementById('dashboardPage').classList.add('d-none');
+      } else {
+        // Authenticate route
+        const user = window.db.getCurrentUser();
+        if (!user || user.type !== 'customer') {
+          window.location.href = "login.html";
+          return;
+        }
+        
+        loadCustomerDashboard(user);
+      }
+    });
+
+    // Handle registration form submit
+    const regForm = document.getElementById('registerForm');
+    if (regForm) {
+      regForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!regForm.checkValidity()) {
+          e.stopPropagation();
+          regForm.classList.add('was-validated');
+          return;
+        }
+
+        const name = document.getElementById('regName').value;
+        const email = document.getElementById('regEmail').value;
+        const phone = document.getElementById('regPhone').value;
+        const dob = document.getElementById('regDob').value;
+        const employment = document.getElementById('regEmployment').value;
+        const income = parseFloat(document.getElementById('regIncome').value) || 0;
+        
+        // Generate new customer object
+        const newId = `CUST-${Math.floor(1000 + Math.random() * 9000)}`;
+        const score = Math.floor(620 + Math.random() * 200); // randomize credit score pull for registration demo
+        
+        const customer = {
+          id: newId,
+          name: name,
+          email: email,
+          phone: phone,
+          dob: dob,
+          employment: employment,
+          income: income,
+          kycStatus: "Verified",
+          registeredDate: new Date().toISOString().split('T')[0],
+          score: score
+        };
+
+        window.db.addCustomer(customer);
+        window.db.setCurrentUser({
+          ...customer,
+          type: "customer"
+        });
+
+        // Redirect to logged-in dashboard view
+        window.location.href = "customer-dashboard.html";
+      });
+    }
+
+    // Load customer dashboard components
+    function loadCustomerDashboard(user) {
+      document.getElementById('customerLabel').textContent = user.name;
+      document.getElementById('custTopLabel').textContent = user.name;
+      document.getElementById('welcomeHeadline').innerHTML = `Welcome Back, <span class="text-primary">${user.name}</span>!`;
+      
+      // Load metrics
+      document.getElementById('metricIncome').textContent = `$${user.income.toLocaleString()}`;
+      document.getElementById('metricFico').textContent = user.score;
+      
+      const scoreBadge = document.getElementById('metricFicoBadge');
+      if (user.score >= 740) {
+        scoreBadge.className = "badge bg-success";
+        scoreBadge.textContent = "Excellent Risk Tier";
+      } else if (user.score >= 670) {
+        scoreBadge.className = "badge bg-warning text-dark";
+        scoreBadge.textContent = "Good Risk Tier";
+      } else {
+        scoreBadge.className = "badge bg-danger";
+        scoreBadge.textContent = "Subprime Tier";
+      }
+
+      // Fetch applications
+      const allApps = window.db.getApplications();
+      const myApps = allApps.filter(app => app.customerId === user.id);
+      
+      document.getElementById('metricAppsCount').textContent = myApps.length;
+
+      // Populate applications table
+      const body = document.getElementById('customerAppsBody');
+      body.innerHTML = '';
+      
+      if (myApps.length === 0) {
+        body.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">You have not submitted any loan applications yet. Browse the products catalog below to apply!</td></tr>';
+      } else {
+        // Sort most recent first
+        myApps.sort((a,b) => b.id.localeCompare(a.id));
+        myApps.forEach(app => {
+          const product = window.db.getProduct(app.productId) || { name: "Unknown" };
+          
+          let statusBadgeClass = "badge-new";
+          let statusLabel = "New";
+          if (app.status === 'UNDER_REVIEW') {
+            statusBadgeClass = "badge-under-review";
+            statusLabel = "Under Review";
+          } else if (app.status === 'APPROVED') {
+            statusBadgeClass = "badge-approved";
+            statusLabel = "Approved";
+          } else if (app.status === 'REJECTED') {
+            statusBadgeClass = "badge-rejected";
+            statusLabel = "Rejected";
+          } else if (app.status === 'DISBURSED') {
+            statusBadgeClass = "badge-approved bg-primary text-white border-primary";
+            statusLabel = "Funds Transferred";
+          }
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="fw-bold text-primary">${app.id}</td>
+            <td>${product.name}</td>
+            <td class="fw-bold">$${app.amount.toLocaleString()}</td>
+            <td>${app.tenure} Months</td>
+            <td>${app.date}</td>
+            <td><span class="badge-status ${statusBadgeClass}">${statusLabel}</span></td>
+            <td class="text-end">
+              <button class="btn btn-sm btn-outline-primary py-1 px-2.5" onclick="showAppDetails('${app.id}')">View</button>
+            </td>
+          `;
+          body.appendChild(tr);
+        });
+
+        // Stepper updates based on the absolute newest application
+        const latestApp = myApps[0];
+        document.getElementById('timelineCard').classList.remove('d-none');
+        document.getElementById('timelineAppId').textContent = latestApp.id;
+        const latProdName = window.db.getProduct(latestApp.productId)?.name || "Lending Product";
+        document.getElementById('timelineProdName').textContent = latProdName;
+        document.getElementById('timelineAmount').textContent = `$${latestApp.amount.toLocaleString()}`;
+
+        updateStepper(latestApp);
+      }
+
+      // Populate products catalog
+      const catalog = document.getElementById('productsCatalogContainer');
+      catalog.innerHTML = '';
+      
+      const products = window.db.getProducts();
+      products.forEach(prod => {
+        const activeClass = prod.status === 'Active';
+        
+        const card = document.createElement('div');
+        card.className = "col-md-6 col-xl-4";
+        card.innerHTML = `
+          <div class="card product-card h-100 bg-white">
+            <div class="card-body d-flex flex-column justify-content-between p-4">
+              <div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <span class="text-uppercase text-xs fw-bold text-muted">${prod.classification}</span>
+                  <span class="badge ${activeClass ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-muted'}">${prod.status}</span>
+                </div>
+                <h5 class="fw-bold text-dark mb-2">${prod.name}</h5>
+                <p class="small text-muted mb-3.5">${prod.description}</p>
+                
+                <div class="mb-3.5 pt-3 border-top">
+                  <div class="d-flex justify-content-between mb-1">
+                    <span class="text-muted small">Standard Rate</span>
+                    <span class="fw-bold text-dark">${prod.rateMin}% - ${prod.rateMax}% APR</span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-1">
+                    <span class="text-muted small">Loan Range</span>
+                    <span class="fw-bold text-dark">$${prod.amountMin.toLocaleString()} - $${prod.amountMax.toLocaleString()}</span>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <span class="text-muted small">Repayment term</span>
+                    <span class="fw-bold text-dark">${prod.tenureMin} - ${prod.tenureMax} months</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="d-grid mt-3">
+                <a href="${activeClass ? 'customer-apply.html?productId=' + prod.id : '#'}" 
+                   class="btn ${activeClass ? 'btn-primary' : 'btn-outline-secondary disabled'} w-100 py-2 fs-7 fw-semibold">
+                   ${activeClass ? 'Apply For Account <i class="bi bi-arrow-right-short ms-1"></i>' : 'Program Closed'}
+                </a>
+              </div>
+            </div>
+          </div>
+        `;
+        catalog.appendChild(card);
+      });
+    }
+
+    // Update the timeline visual stepper
+    function updateStepper(app) {
+      const step1 = document.getElementById('step1');
+      const step2 = document.getElementById('step2');
+      const step3 = document.getElementById('step3');
+      const step4 = document.getElementById('step4');
+      const prog = document.getElementById('stepperProgressBar');
+      const msg = document.getElementById('timelineMessage');
+
+      // Clear all statuses
+      [step1, step2, step3, step4].forEach(s => s.className = "step");
+      
+      if (app.status === 'NEW') {
+        step1.classList.add('active');
+        prog.style.width = "0%";
+        msg.textContent = "Your application has been received and queued. A loan officer will be assigned shortly.";
+      } else if (app.status === 'UNDER_REVIEW') {
+        step1.classList.add('completed');
+        step2.classList.add('active');
+        prog.style.width = "25%";
+        msg.textContent = `Credit check and risk evaluation are currently in progress. Assigned reviewer: ${app.analyst}.`;
+      } else if (app.status === 'APPROVED') {
+        step1.classList.add('completed');
+        step2.classList.add('completed');
+        step3.classList.add('active');
+        prog.style.width = "50%";
+        msg.textContent = "Congratulations! Your credit profile has passed underwriting. Currently awaiting Branch Manager signature to release funds.";
+      } else if (app.status === 'REJECTED') {
+        step1.classList.add('completed');
+        step2.classList.add('active');
+        prog.style.width = "25%";
+        // Mark failed review
+        step2.querySelector('.step-icon').innerHTML = '<i class="bi bi-x-circle-fill text-white"></i>';
+        step2.querySelector('.step-icon').style.backgroundColor = '#ef4444';
+        step2.querySelector('.step-icon').style.borderColor = '#ef4444';
+        step2.querySelector('.step-title').textContent = "Declined";
+        step2.querySelector('.step-title').style.color = '#ef4444';
+        msg.textContent = `Credit evaluation concluded. Unfortunately, we cannot extend credit at this time. Reason: ${app.remarks}`;
+      } else if (app.status === 'DISBURSED') {
+        step1.classList.add('completed');
+        step2.classList.add('completed');
+        step3.classList.add('completed');
+        step4.classList.add('completed');
+        prog.style.width = "100%";
+        msg.textContent = "Disbursement successful. Electronic funds have been released and wired to your registered checking account.";
+      }
+    }
+
+    // Modal popup helper
+    function showAppDetails(appId) {
+      const app = window.db.getApplication(appId);
+      if (!app) return;
+
+      const product = window.db.getProduct(app.productId) || { name: "Lending Product" };
+      document.getElementById('mAppId').textContent = app.id;
+      document.getElementById('mAppProduct').textContent = product.name;
+      document.getElementById('mAppAmount').textContent = `$${app.amount.toLocaleString()}`;
+      document.getElementById('mAppTenure').textContent = `${app.tenure} Months`;
+      document.getElementById('mAppDate').textContent = app.date;
+      document.getElementById('mAppAuditor').textContent = app.analyst || "Pending Audit Assignment";
+      document.getElementById('mAppRemarks').textContent = app.remarks || "No evaluation remarks recorded yet.";
+
+      const badge = document.getElementById('mAppBadge');
+      badge.textContent = app.status;
+      badge.className = "badge-status";
+      if (app.status === 'NEW') badge.classList.add('badge-new');
+      else if (app.status === 'UNDER_REVIEW') badge.classList.add('badge-under-review');
+      else if (app.status === 'APPROVED') badge.classList.add('badge-approved');
+      else if (app.status === 'REJECTED') badge.classList.add('badge-rejected');
+      else if (app.status === 'DISBURSED') badge.classList.add('badge-approved', 'bg-primary', 'text-white', 'border-primary');
+
+      const modal = new bootstrap.Modal(document.getElementById('appDetailsModal'));
+      modal.show();
+    }
+
+    // Handle logout action
+    function handleLogout(e) {
+      e.preventDefault();
+      window.db.logout();
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html>

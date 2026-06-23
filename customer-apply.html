@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apply for Loan - Apex Credit System</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Custom Styles -->
+  <link href="assets/css/style.css" rel="stylesheet">
+  <!-- Database Script -->
+  <script src="assets/js/db.js"></script>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="brand">
+      <span class="bg-primary text-white rounded-2 p-1.5 d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+        <i class="bi bi-shield-lock-fill fs-6 text-info"></i>
+      </span>
+      <span class="text-white fw-bold mb-0">Apex Credit</span>
+    </div>
+    
+    <div class="nav-links">
+      <a href="customer-dashboard.html" class="nav-link">
+        <i class="bi bi-grid-1x2-fill"></i>
+        <span>My Dashboard</span>
+      </a>
+      <a href="customer-apply.html" class="nav-link active">
+        <i class="bi bi-plus-circle"></i>
+        <span>Apply for Loan</span>
+      </a>
+      <div class="border-top border-secondary-subtle opacity-25 my-3"></div>
+      <a href="#" onclick="handleLogout(event)" class="nav-link text-danger">
+        <i class="bi bi-box-arrow-right text-danger"></i>
+        <span>Sign Out</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="d-flex align-items-center">
+        <div class="bg-primary text-white rounded-circle p-2 me-2 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+          <i class="bi bi-person-fill text-info"></i>
+        </div>
+        <div class="overflow-hidden me-auto" style="line-height: 1.2;">
+          <div id="customerLabel" class="text-white fw-semibold text-truncate" style="font-size: 0.85rem;">Eleanor Vance</div>
+          <small class="text-muted" style="font-size: 0.75rem;">Premium Customer</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <div class="main-wrapper">
+    <!-- TOP NAVBAR -->
+    <nav class="top-navbar">
+      <div class="d-flex align-items-center">
+        <button class="btn btn-link text-dark p-0 me-3 d-lg-none" id="sidebarToggle">
+          <i class="bi bi-list fs-3"></i>
+        </button>
+        <h4 class="mb-0 fw-semibold text-dark">Origination Service</h4>
+      </div>
+
+      <div class="d-flex align-items-center gap-3">
+        <span id="custTopLabel" class="text-dark fw-medium" style="font-size: 0.9rem;">Eleanor Vance</span>
+      </div>
+    </nav>
+
+    <div class="content-container">
+      
+      <!-- Page Header -->
+      <div class="mb-4">
+        <h2 class="fw-bold mb-1">Apply For Credit</h2>
+        <p class="text-muted mb-0">Select an active credit product, specify borrowing details, and check eligibility instantly.</p>
+      </div>
+
+      <div class="row g-4">
+        <!-- Form Column -->
+        <div class="col-lg-7">
+          <div class="card h-100">
+            <div class="card-header bg-white py-3 border-bottom">
+              <h5 class="mb-0 fw-bold text-dark">Lending Program Selection & Parameters</h5>
+            </div>
+            <div class="card-body">
+              <form class="needs-validation" novalidate id="customerLoanForm">
+                
+                <!-- Product Selection -->
+                <div class="mb-3.5">
+                  <label for="productPicker" class="form-label">Loan Product <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-tag text-muted"></i></span>
+                    <select class="form-select" id="productPicker" required>
+                      <option value="" disabled selected>Select active loan product...</option>
+                    </select>
+                  </div>
+                  <div class="invalid-feedback">Please select a lending program.</div>
+                  <div id="productLimitsText" class="form-text text-muted small mt-1"></div>
+                </div>
+
+                <!-- Requested Amount -->
+                <div class="row g-3 mt-2">
+                  <div class="col-md-6">
+                    <label for="requestedAmount" class="form-label">Requested Amount ($) <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light">$</span>
+                      <input type="number" class="form-control" id="requestedAmount" placeholder="e.g. 50000" required>
+                    </div>
+                    <div class="invalid-feedback" id="amountFeedback">Please enter a valid amount.</div>
+                  </div>
+
+                  <!-- Tenure -->
+                  <div class="col-md-6">
+                    <label for="tenureMonths" class="form-label">Repayment Tenure (Months) <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                      <input type="number" class="form-control" id="tenureMonths" placeholder="e.g. 36" required>
+                      <span class="input-group-text bg-light">Months</span>
+                    </div>
+                    <div class="invalid-feedback" id="tenureFeedback">Please enter tenure in months.</div>
+                  </div>
+                </div>
+
+                <!-- Co-Signer / Guarantor -->
+                <div class="form-check form-switch mt-4 mb-4">
+                  <input class="form-check-input" type="checkbox" role="switch" id="hasGuarantor">
+                  <label class="form-check-label text-muted" for="hasGuarantor">Add Co-Signer / Guarantor</label>
+                </div>
+
+                <!-- Co-Signer inputs -->
+                <div class="bg-light p-3 rounded-3 mb-4 d-none" id="guarantorFields">
+                  <h6 class="fw-bold mb-3 small text-primary text-uppercase">Co-Signer Details</h6>
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label for="gName" class="form-label small">Guarantor Name</label>
+                      <input type="text" class="form-control form-control-sm" id="gName">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="gIncome" class="form-label small">Guarantor Monthly Income ($)</label>
+                      <input type="number" class="form-control form-control-sm" id="gIncome">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- remarks -->
+                <div class="mb-4">
+                  <label for="origRemarks" class="form-label">Additional notes / Remarks</label>
+                  <textarea class="form-control" id="origRemarks" rows="2" placeholder="e.g. Applying for business expansion. Income statements can be provided immediately."></textarea>
+                </div>
+
+                <!-- Action buttons -->
+                <div class="border-top pt-3 d-flex justify-content-end gap-2">
+                  <a href="customer-dashboard.html" class="btn btn-outline-secondary">Cancel</a>
+                  <button type="submit" class="btn btn-primary">Submit Application</button>
+                </div>
+
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Calculator Column -->
+        <div class="col-lg-5">
+          <div class="card h-100 border-primary-subtle" style="background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);">
+            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+              <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-calculator text-primary me-2"></i>Live EMI Estimator</h5>
+              <span class="badge bg-success-subtle text-success border border-success-subtle">Real-Time Forecast</span>
+            </div>
+            
+            <div class="card-body d-flex flex-column justify-content-between">
+              
+              <div>
+                <div class="text-center py-4 bg-white rounded-3 shadow-sm border mb-4">
+                  <span class="text-muted small text-uppercase fw-semibold d-block mb-1">Estimated Monthly EMI</span>
+                  <div class="display-5 fw-bold text-primary" id="emiDisplay">$0.00</div>
+                  <small class="text-muted" id="interestRatePreview">Based on 0.00% standard interest rate</small>
+                </div>
+
+                <!-- Calculations Breakdown -->
+                <div class="space-y-3">
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted small">Total Principal</span>
+                    <span class="fw-semibold text-dark" id="principalPreview">$0.00</span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted small">Tenure Duration</span>
+                    <span class="fw-semibold text-dark" id="tenurePreview">0 Months</span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted small">Total Interest Accrued</span>
+                    <span class="fw-semibold text-dark text-warning" id="interestAccruedPreview">$0.00</span>
+                  </div>
+                  <hr class="text-muted opacity-25">
+                  <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="text-dark fw-bold">Total Repayment Amount</span>
+                    <span class="fs-5 fw-bold text-dark" id="totalRepayPreview">$0.00</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- DTI Assessment Indicator -->
+              <div class="p-3 bg-light rounded-3 border">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="small fw-semibold text-muted">Debt-to-Income (DTI) Forecast</span>
+                  <span class="badge bg-secondary-subtle text-secondary" id="dtiBadge">N/A</span>
+                </div>
+                <div class="progress" style="height: 6px;" role="progressbar" aria-label="DTI progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                  <div class="progress-bar bg-success" style="width: 0%" id="dtiProgress"></div>
+                </div>
+                <small class="text-muted d-block mt-2" style="font-size: 0.75rem;">
+                  * Recommended maximum DTI ratio for approved credit risk is <strong>45%</strong>.
+                </small>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Responsive sidebar toggler
+    const toggleBtn = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    if (toggleBtn && sidebar) {
+      toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('show');
+      });
+    }
+
+    // Toggle guarantor details fields
+    const hasGuarantor = document.getElementById('hasGuarantor');
+    const guarantorFields = document.getElementById('guarantorFields');
+    if (hasGuarantor && guarantorFields) {
+      hasGuarantor.addEventListener('change', () => {
+        if (hasGuarantor.checked) {
+          guarantorFields.classList.remove('d-none');
+        } else {
+          guarantorFields.classList.add('d-none');
+        }
+      });
+    }
+
+    // Page Authentication & Setup
+    let currentUser = null;
+    document.addEventListener('DOMContentLoaded', () => {
+      currentUser = window.db.getCurrentUser();
+      if (!currentUser || currentUser.type !== 'customer') {
+        window.location.href = "login.html";
+        return;
+      }
+
+      document.getElementById('customerLabel').textContent = currentUser.name;
+      document.getElementById('custTopLabel').textContent = currentUser.name;
+
+      // Populate product Picker with Active products
+      const picker = document.getElementById('productPicker');
+      const products = window.db.getProducts().filter(p => p.status === 'Active');
+      
+      products.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = `${p.name} (${p.classification})`;
+        picker.appendChild(opt);
+      });
+
+      // Check query string parameters on load (if coming from catalog click)
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlProdId = urlParams.get('productId');
+      if (urlProdId) {
+        picker.value = urlProdId;
+        calculateEMI();
+      }
+    });
+
+    // Dynamic Live Calculator implementation
+    const productPicker = document.getElementById('productPicker');
+    const requestedAmount = document.getElementById('requestedAmount');
+    const tenureMonths = document.getElementById('tenureMonths');
+
+    // UI elements to update
+    const emiDisplay = document.getElementById('emiDisplay');
+    const interestRatePreview = document.getElementById('interestRatePreview');
+    const principalPreview = document.getElementById('principalPreview');
+    const tenurePreview = document.getElementById('tenurePreview');
+    const interestAccruedPreview = document.getElementById('interestAccruedPreview');
+    const totalRepayPreview = document.getElementById('totalRepayPreview');
+    const dtiBadge = document.getElementById('dtiBadge');
+    const dtiProgress = document.getElementById('dtiProgress');
+    const productLimitsText = document.getElementById('productLimitsText');
+
+    const amountFeedback = document.getElementById('amountFeedback');
+    const tenureFeedback = document.getElementById('tenureFeedback');
+
+    function calculateEMI() {
+      const amount = parseFloat(requestedAmount.value) || 0;
+      const term = parseInt(tenureMonths.value) || 0;
+      
+      const prodId = productPicker.value;
+      if (!prodId) {
+        resetCalculator();
+        return;
+      }
+
+      const prod = window.db.getProduct(prodId);
+      if (!prod) {
+        resetCalculator();
+        return;
+      }
+
+      // Configure ranges
+      productLimitsText.textContent = `Min/Max Amount: $${prod.amountMin.toLocaleString()} - $${prod.amountMax.toLocaleString()} | Min/Max Term: ${prod.tenureMin} - ${prod.tenureMax} months`;
+
+      // Set input properties dynamically
+      requestedAmount.setAttribute('min', prod.amountMin);
+      requestedAmount.setAttribute('max', prod.amountMax);
+      tenureMonths.setAttribute('min', prod.tenureMin);
+      tenureMonths.setAttribute('max', prod.tenureMax);
+
+      amountFeedback.textContent = `Please enter amount between $${prod.amountMin.toLocaleString()} and $${prod.amountMax.toLocaleString()}.`;
+      tenureFeedback.textContent = `Please enter tenure between ${prod.tenureMin} and ${prod.tenureMax} months.`;
+
+      if (amount <= 0 || term <= 0) {
+        principalPreview.textContent = `$${amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        tenurePreview.textContent = `${term} Months`;
+        return;
+      }
+
+      // Calculate middle-point rate for calculations
+      const rate = (prod.rateMin + prod.rateMax) / 2;
+      const monthlyRate = (rate / 100) / 12;
+      let emi = 0;
+      if (monthlyRate > 0) {
+        emi = amount * monthlyRate * Math.pow(1 + monthlyRate, term) / (Math.pow(1 + monthlyRate, term) - 1);
+      } else {
+        emi = amount / term;
+      }
+      
+      const totalRepayment = emi * term;
+      const interestPayable = totalRepayment - amount;
+
+      // Update Calculator display
+      emiDisplay.textContent = `$${emi.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      interestRatePreview.textContent = `Based on average ${rate.toFixed(2)}% standard interest rate`;
+      principalPreview.textContent = `$${amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      tenurePreview.textContent = `${term} Months`;
+      interestAccruedPreview.textContent = `$${interestAccruedPreview.textContent = interestPayable.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      totalRepayPreview.textContent = `$${totalRepayment.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+      // Update DTI indicator if customer selected
+      if (currentUser) {
+        const income = currentUser.income;
+        if (income > 0) {
+          const dtiRatio = (emi / income) * 100;
+          dtiBadge.textContent = `${dtiRatio.toFixed(1)}%`;
+          dtiProgress.style.width = `${Math.min(dtiRatio, 100)}%`;
+          
+          if (dtiRatio > 45) {
+            dtiBadge.className = "badge bg-danger";
+            dtiProgress.className = "progress-bar bg-danger";
+          } else if (dtiRatio > 35) {
+            dtiBadge.className = "badge bg-warning text-dark";
+            dtiProgress.className = "progress-bar bg-warning";
+          } else {
+            dtiBadge.className = "badge bg-success";
+            dtiProgress.className = "progress-bar bg-success";
+          }
+        }
+      }
+    }
+
+    function resetCalculator() {
+      emiDisplay.textContent = "$0.00";
+      interestRatePreview.textContent = "Based on 0.00% standard interest rate";
+      principalPreview.textContent = "$0.00";
+      tenurePreview.textContent = "0 Months";
+      interestAccruedPreview.textContent = "$0.00";
+      totalRepayPreview.textContent = "$0.00";
+      dtiBadge.textContent = "N/A";
+      dtiBadge.className = "badge bg-secondary-subtle text-secondary";
+      dtiProgress.style.width = "0%";
+      productLimitsText.textContent = "";
+    }
+
+    // Attach listeners
+    productPicker.addEventListener('change', calculateEMI);
+    requestedAmount.addEventListener('input', calculateEMI);
+    tenureMonths.addEventListener('input', calculateEMI);
+
+    // Form Validator & Submit Handler
+    const form = document.getElementById('customerLoanForm');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!form.checkValidity()) {
+        e.stopPropagation();
+        form.classList.add('was-validated');
+        return;
+      }
+
+      // Read form data
+      const prodId = productPicker.value;
+      const amount = parseFloat(requestedAmount.value);
+      const tenure = parseInt(tenureMonths.value);
+      const remarks = document.getElementById('origRemarks').value;
+
+      // Create application
+      const newAppId = `APP-${Math.floor(9000 + Math.random() * 999)}`;
+      const newApp = {
+        id: newAppId,
+        customerId: currentUser.id,
+        productId: prodId,
+        amount: amount,
+        tenure: tenure,
+        status: "NEW",
+        analyst: "— (Unassigned)",
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        remarks: remarks || "Customer self-applied online."
+      };
+
+      window.db.addApplication(newApp);
+
+      // Redirect to customer dashboard
+      window.location.href = "customer-dashboard.html";
+    });
+
+    // Handle logout action
+    function handleLogout(e) {
+      e.preventDefault();
+      window.db.logout();
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html>
