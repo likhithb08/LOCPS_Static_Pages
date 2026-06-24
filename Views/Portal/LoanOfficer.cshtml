@@ -1,0 +1,11 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Loan Officer Dashboard";
+    var role = Request.Query["role"].ToString();
+}
+<div class="container mt-4">
+    <h2 class="mb-4">Loan Officer Dashboard</h2>
+    <p>Welcome, Loan Officer! Here you can manage new loan applications.</p>
+    <div id="newApplications" class="row"></div>
+</div>
+<script src="~/wwwroot/js/portal.js"></script>

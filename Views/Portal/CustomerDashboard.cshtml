@@ -1,0 +1,64 @@
+@using System.Collections.Generic
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Customer Dashboard";
+    // Simulated loan data
+    var loanProducts = new List<dynamic> {
+        new { Id = 1, Name = "Personal Loan", Amount = 5000 },
+        new { Id = 2, Name = "Home Loan", Amount = 200000 },
+        new { Id = 3, Name = "Auto Loan", Amount = 15000 }
+    };
+    var appliedLoans = new List<dynamic> {
+        new { Id = 101, Product = "Personal Loan", Status = "Pending KYC" },
+        new { Id = 102, Product = "Auto Loan", Status = "Approved" }
+    };
+}
+<div class="container mt-4">
+    <h2 class="mb-4">Welcome, @User.Identity.Name</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Loan Catalog</h4>
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr><th>Name</th><th>Amount</th><th>Action</th></tr>
+                </thead>
+                <tbody>
+                @foreach (var p in loanProducts) {
+                    <tr>
+                        <td>@p.Name</td>
+                        <td>@String.Format("{0:C}", p.Amount)</td>
+                        <td><button class="btn btn-primary btn-sm" onclick="applyLoan(@p.Id)">Apply</button></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <h4>Your Applications</h4>
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr><th>Application ID</th><th>Product</th><th>Status</th></tr>
+                </thead>
+                <tbody id="applications-body">
+                @foreach (var a in appliedLoans) {
+                    <tr data-id="@a.Id">
+                        <td>@a.Id</td>
+                        <td>@a.Product</td>
+                        <td>@a.Status</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+            <div id="kyc-section" class="mt-3">
+                <h5>KYC Verification</h5>
+                <p>Upload required documents to complete KYC.</p>
+                <input type="file" id="kyc-adhar" accept="image/*,.pdf" class="form-control mb-2" placeholder="Aadhaar"/>
+                <input type="file" id="kyc-pan" accept="image/*,.pdf" class="form-control mb-2" placeholder="PAN"/>
+                <input type="file" id="kyc-passport" accept="image/*,.pdf" class="form-control mb-2" placeholder="Passport"/>
+                <button class="btn btn-success" onclick="verifyKYC()">Submit KYC</button>
+                <div id="kyc-result" class="mt-2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/wwwroot/js/portal.js"></script>

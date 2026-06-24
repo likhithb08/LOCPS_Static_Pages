@@ -1,0 +1,11 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Underwriter Dashboard";
+    var role = Request.Query["role"].ToString();
+}
+<div class="container mt-4">
+    <h2 class="mb-4">Underwriter Dashboard</h2>
+    <p>Review applications with calculated credit scores.</p>
+    <div id="pendingApplications" class="row"></div>
+</div>
+<script src="~/wwwroot/js/portal.js"></script>

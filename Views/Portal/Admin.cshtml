@@ -1,0 +1,34 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Admin Dashboard";
+}
+
+<h2 class="mt-4">Admin Dashboard</h2>
+<div class="row mt-4">
+    <div class="col-md-12">
+        <h4>All Loan Applications</h4>
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Application ID</th>
+                    <th>Customer</th>
+                    <th>Status</th>
+                    <th>Requested Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="admin-loan-table-body">
+                <!-- Rows will be injected by portal.js -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <button class="btn btn-primary" id="btn-add-loan">Add New Loan</button>
+    </div>
+    <div class="col-md-6 text-end">
+        <button class="btn btn-danger" id="btn-reset-data">Reset Demo Data</button>
+    </div>
+</div>

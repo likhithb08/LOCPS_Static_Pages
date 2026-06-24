@@ -1,0 +1,24 @@
+@* _Layout.cshtml - Base layout *@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - Loan Origination</title>
+    <!-- Bootstrap 5.3 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ENjdO4Dr2bkBIFxQpeoYz1HIe6VdFm73G9v5x7Fc1YJ3zFuj0wK5y0t+0p5u9y+N" crossorigin="anonymous" />
+    <link rel="stylesheet" href="~/wwwroot/css/custom.css" />
+</head>
+<body class="bg-light">
+    <header class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="@Url.Action("Index", "Home")">Loan Origination</a>
+        </div>
+    </header>
+    <div class="container">
+        @RenderBody()
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+1zt7zRN1zY+8K5c5K7Z+3M6Q5/6h" crossorigin="anonymous"></script>
+    <script src="~/wwwroot/js/portal.js"></script>
+</body>
+</html>

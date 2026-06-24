@@ -1,0 +1,16 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var role = Request.Query["role"].ToString().ToLower();
+}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Staff Portal - @role.ToUpper() Dashboard</h2>
+    @if (role == "loanofficer") {
+        <partial name="~/Views/Portal/LoanOfficer.cshtml" />
+    } else if (role == "underwriter") {
+        <partial name="~/Views/Portal/Underwriter.cshtml" />
+    } else if (role == "admin") {
+        <partial name="~/Views/Portal/Admin.cshtml" />
+    } else {
+        <div class="alert alert-warning">Invalid role specified.</div>
+    }
+</div>
